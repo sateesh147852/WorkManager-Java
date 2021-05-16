@@ -26,12 +26,12 @@ public class MyWorker extends Worker {
     @NonNull
     @Override
     public Result doWork() {
-        //displayNotification("My Worker", "Hey I finished my work");
+        displayNotification("My Worker", "Hey I finished my work");
         String task = getInputData().getString(TASK_DESC);
         showToastMessage(task);
 
         Data data = new Data.Builder()
-                .putString(TASK_DESC,"The conclusion of the task")
+                .putString(TASK_DESC,task)
                 .build();
 
         return Result.success(data);

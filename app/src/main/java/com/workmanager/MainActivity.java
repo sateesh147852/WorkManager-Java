@@ -1,6 +1,7 @@
 package com.workmanager;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -23,7 +24,9 @@ public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
     private Data data;
+    private Data data1;
     private Constraints constraints;
+    private static final String TAG = MainActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,21 +35,24 @@ public class MainActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         data = new Data.Builder()
-                .putString(TASK_DESC, "The task data passed from MainActivity")
+                .putString(TASK_DESC, "data passed from MainActivity")
                 .build();
 
-        constraints = new Constraints.Builder().setRequiresCharging(false).build();
+        data1 = new Data.Builder()
+                .putString(TASK_DESC, "data passed from MainActivity2")
+                .build();
 
-        initializeOneTimeRequest();
+        //constraints = new Constraints.Builder().setRequiresCharging(false).build();
+
+        //initializeOneTimeRequest();
         //initializeOnePeriodicRequest();
-        //initializeChainedRequest();
+        initializeChainedRequest();
     }
 
     private void initializeOneTimeRequest() {
 
         final OneTimeWorkRequest oneTimeWorkRequest = new OneTimeWorkRequest.Builder(MyWorker.class)
                 .setInputData(data)
-                .setConstraints(constraints)
                 .build();
 
 
@@ -76,20 +82,19 @@ public class MainActivity extends AppCompatActivity {
                 .build();
 
         final OneTimeWorkRequest oneTimeWorkRequest1 = new OneTimeWorkRequest.Builder(MyWorker.class)
-                .setInputData(data)
+                .setInputData(data1)
                 .build();
 
 
         binding.btEnqueueWork.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                WorkManager.getInstance().beginWith(oneTimeWorkRequest).then(oneTimeWorkRequest).enqueue();
 
-                /*ArrayList<OneTimeWorkRequest> requests = new ArrayList<>();
+                ArrayList<OneTimeWorkRequest> requests = new ArrayList<>();
                 requests.add(oneTimeWorkRequest);
                 requests.add(oneTimeWorkRequest1);
 
-                WorkManager.getInstance().enqueue(requests);*/
+                WorkManager.getInstance().enqueue(requests);
             }
         });
 
@@ -109,14 +114,13 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
-
-
     }
 
     private void initializeOnePeriodicRequest() {
 
         final PeriodicWorkRequest periodicWorkRequest = new PeriodicWorkRequest
                 .Builder(MyWorker.class, 15, TimeUnit.MINUTES)
+                .setInputData(data)
                 .build();
 
         binding.btEnqueueWork.setOnClickListener(new View.OnClickListener() {
@@ -125,14 +129,6 @@ public class MainActivity extends AppCompatActivity {
                 WorkManager.getInstance().enqueue(periodicWorkRequest);
             }
         });
-
-        WorkManager.getInstance().getWorkInfoByIdLiveData(periodicWorkRequest.getId())
-                .observe(this, new Observer<WorkInfo>() {
-                    @Override
-                    public void onChanged(WorkInfo workInfo) {
-                        binding.tvStatus.setText(workInfo.getOutputData().getString(TASK_DESC));
-                    }
-                });
 
     }
 

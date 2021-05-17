@@ -1,7 +1,6 @@
 package com.workmanager;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -44,9 +43,15 @@ public class MainActivity extends AppCompatActivity {
 
         //constraints = new Constraints.Builder().setRequiresCharging(false).build();
 
-        //initializeOneTimeRequest();
-        //initializeOnePeriodicRequest();
-        initializeChainedRequest();
+
+        binding.btEnqueueWork.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //initializeOneTimeRequest();
+                //initializeOnePeriodicRequest();
+                initializeChainedRequest();
+            }
+        });
     }
 
     private void initializeOneTimeRequest() {
@@ -55,14 +60,7 @@ public class MainActivity extends AppCompatActivity {
                 .setInputData(data)
                 .build();
 
-
-        binding.btEnqueueWork.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                WorkManager.getInstance().enqueue(oneTimeWorkRequest);
-            }
-        });
-
+        WorkManager.getInstance().enqueue(oneTimeWorkRequest);
         WorkManager.getInstance().getWorkInfoByIdLiveData(oneTimeWorkRequest.getId())
                 .observe(this, new Observer<WorkInfo>() {
                     @Override
@@ -70,7 +68,6 @@ public class MainActivity extends AppCompatActivity {
                         binding.tvStatus.setText(workInfo.getOutputData().getString(TASK_DESC));
                     }
                 });
-
 
     }
 
@@ -86,17 +83,11 @@ public class MainActivity extends AppCompatActivity {
                 .build();
 
 
-        binding.btEnqueueWork.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        ArrayList<OneTimeWorkRequest> requests = new ArrayList<>();
+        requests.add(oneTimeWorkRequest);
+        requests.add(oneTimeWorkRequest1);
 
-                ArrayList<OneTimeWorkRequest> requests = new ArrayList<>();
-                requests.add(oneTimeWorkRequest);
-                requests.add(oneTimeWorkRequest1);
-
-                WorkManager.getInstance().enqueue(requests);
-            }
-        });
+        WorkManager.getInstance().enqueue(requests);
 
         WorkManager.getInstance().getWorkInfoByIdLiveData(oneTimeWorkRequest.getId())
                 .observe(this, new Observer<WorkInfo>() {
@@ -123,12 +114,7 @@ public class MainActivity extends AppCompatActivity {
                 .setInputData(data)
                 .build();
 
-        binding.btEnqueueWork.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                WorkManager.getInstance().enqueue(periodicWorkRequest);
-            }
-        });
+        WorkManager.getInstance().enqueue(periodicWorkRequest);
 
     }
 
